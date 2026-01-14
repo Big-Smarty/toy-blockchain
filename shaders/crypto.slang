@@ -6,9 +6,11 @@ import "sha256";
 // - MUST precalculate the index of the word the nonce should be written into
 // - MUST profit???
 
+// TODO: expect words instead of blocks
+
 struct PushConstants {
   uint32_t generation;
-  uint32_t block_count;
+  uint32_t word_count;
   uint32_t nonce_index;
 };
 
@@ -16,7 +18,7 @@ struct PushConstants {
 PushConstants push_constants;
 
 [[vk::binding(0, 0)]]
-StructuredBuffer<uint32_t> blocks;
+StructuredBuffer<uint32_t> words;
 
 [[vk::binding(0, 1)]]
 RWStructuredBuffer<uint32_t> hash;
@@ -33,7 +35,7 @@ uint32_t get_nonce(uint32_t id, uint32_t generation) {
 void main(uint3 ID: SV_DispatchThreadID) {
   uint32_t idx = ID.x;
   uint32_t nonce = get_nonce(idx, push_constants.generation);
-  uint32_t[8] hash_result = sha256(blocks, push_constants.block_count);
+  uint32_t[8] hash_result = sha256(words, push_constants.word_count, nonce, push_constants.nonce_index);
   for (uint32_t i; i < 8; i++) {
     hash[i] = hash_result[i];
   }

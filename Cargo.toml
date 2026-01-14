@@ -1,0 +1,12 @@
+[package]
+name = "toy_blockchain"
+version = "0.0.1"
+authors = ["Big Smarty"]
+description = "Toy Blockchain on the GPU using Slang and Vulkano"
+edition = "2024"
+
+[dependencies]
+vulkano = "0.35.2"
+chrono = "0.4"
+hex = "0.4"
+sha1 = "0.10.6"
