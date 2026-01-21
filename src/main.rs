@@ -1,18 +1,15 @@
-mod bruteforce;
 mod context;
 mod push_constants;
 mod shader;
 mod transaction;
 mod util;
 
-use std::sync::{Arc, atomic::AtomicU64};
-
 use crate::{
     push_constants::PushConstants,
     util::{check_k_nibbles, hash_to_iv, sha256},
 };
 
-const K: u32 = 8;
+const K: u32 = 7;
 
 // TODO: while waiting on the gpu invocation, bruteforce on the cpu.
 // NOTE: do this with tokio select
@@ -36,11 +33,8 @@ async fn main() {
     // genesis transaction
     {
         let mut nonce = 0;
-        let cpu_nonce_counter = Arc::new(AtomicU64::new(u64::MAX / 2));
         while nonce == 0 {
-            let token = tokio_util::sync::CancellationToken::new();
-            let cpu_counter = cpu_nonce_counter.clone();
-            nonce = tokio::select! {res = context.invoke(&push_constants) => {token.cancel(); res}, res = bruteforce::bruteforce(words.clone(), K, nonce_index as usize, token.clone(), cpu_counter) => {println!("CPU hashed ts!"); res.expect("CPU bruteforce failed")}};
+            nonce = context.invoke(&push_constants).await;
             hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
@@ -89,11 +83,8 @@ async fn main() {
         };
 
         let mut nonce = 0;
-        let cpu_nonce_counter = Arc::new(AtomicU64::new(u64::MAX / 2));
         while nonce == 0 {
-            let token = tokio_util::sync::CancellationToken::new();
-            let cpu_counter = cpu_nonce_counter.clone();
-            nonce = tokio::select! {res = context.invoke(&push_constants) => {token.cancel(); res}, res = bruteforce::bruteforce(words.clone(), K, nonce_index as usize, token.clone(), cpu_counter) => {println!("CPU hashed ts!"); res.expect("CPU bruteforce failed")}};
+            nonce = context.invoke(&push_constants).await;
             hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
@@ -140,11 +131,8 @@ async fn main() {
         };
 
         let mut nonce = 0;
-        let cpu_nonce_counter = Arc::new(AtomicU64::new(u64::MAX / 2));
         while nonce == 0 {
-            let token = tokio_util::sync::CancellationToken::new();
-            let cpu_counter = cpu_nonce_counter.clone();
-            nonce = tokio::select! {res = context.invoke(&push_constants) => {token.cancel(); res}, res = bruteforce::bruteforce(words.clone(), K, nonce_index as usize, token.clone(), cpu_counter) => {println!("CPU hashed ts!"); res.expect("CPU bruteforce failed")}};
+            nonce = context.invoke(&push_constants).await;
             hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
