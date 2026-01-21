@@ -12,7 +12,7 @@ use crate::{
     util::{check_k_nibbles, hash_to_iv, sha256},
 };
 
-const K: u32 = 7;
+const K: u32 = 8;
 
 // TODO: while waiting on the gpu invocation, bruteforce on the cpu.
 // NOTE: do this with tokio select
@@ -32,7 +32,7 @@ async fn main() {
         nonce: context.nonce_address().into(),
         k: K,
     };
-    let mut hash_count = 0;
+    let mut hash_count: u64 = 0;
     // genesis transaction
     {
         let mut nonce = 0;

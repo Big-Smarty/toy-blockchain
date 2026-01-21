@@ -1,7 +1,7 @@
 import "sha256";
 
 struct PushConstants {
-  uint32_t generation;
+  uint64_t generation;
   uint32_t word_count;
   uint32_t nonce_index;
   uint32_t k;
@@ -12,7 +12,7 @@ struct PushConstants {
 [[vk::push_constant]]
 PushConstants push_constants;
 
-uint64_t get_nonce(uint32_t id, uint32_t generation) {
+uint64_t get_nonce(uint32_t id, uint64_t generation) {
   uint3 workgroup_size = WorkgroupSize();
   uint3 workgroup_count = WorkgroupCount();
   uint64_t nonce = (generation * 64 * 8192) + id;
