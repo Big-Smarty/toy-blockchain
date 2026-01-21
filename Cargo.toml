@@ -5,6 +5,13 @@ authors = ["Big Smarty"]
 description = "Toy Blockchain on the GPU using Slang and Vulkano"
 edition = "2024"
 
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = "symbols"
+
+
 [dependencies]
 vulkano = "0.35.2"
 vulkano-shaders = "0.35.0"
@@ -12,3 +19,6 @@ chrono = "0.4"
 hex = "0.4"
 sha1 = "0.10.6"
 sha2 = "0.10"
+tokio = { version = "1.49.0", features = ["full"] }
+tokio-util = "0.7.18"
+rayon = "1.11"
