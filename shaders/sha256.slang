@@ -1,8 +1,5 @@
 module sha256;
 
-// TODO: take working variables out of loop to (potentially) save on registers
-// TODO:
-
 static const uint32_t WORD_SIZE = 32;
 
 static const uint32_t K[64] = {
@@ -19,6 +16,12 @@ static const uint32_t K[64] = {
   0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
+uint32_t[2] split_nonce(uint64_t nonce) {
+  uint32_t a = uint32_t(nonce >> 32);
+  uint32_t b = uint32_t(nonce);
+  return { a, b };
+}
+
 uint32_t rotr(uint32_t x, int n) { return (x >> n) | (x << (WORD_SIZE - n)); }
 uint32_t rotl(uint32_t x, int n) { return (x << n) | (x >> (WORD_SIZE - n)); }
 
@@ -32,8 +35,8 @@ uint32_t ssig0(uint32_t x) { return (rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3)); }
 uint32_t ssig1(uint32_t x) { return (rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10)); }
 
 // expects a buffer of preprocessed words
-public uint32_t[8] sha256(StructuredBuffer<uint32_t> words, uint32_t word_count,
-                          uint32_t nonce, uint32_t nonce_index) {
+public uint32_t[8] sha256(uint32_t* words, uint32_t word_count,
+                          uint64_t nonce, uint32_t nonce_index) {
   uint32_t[8] H = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
                     0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
   uint32_t a = 0;
@@ -44,16 +47,22 @@ public uint32_t[8] sha256(StructuredBuffer<uint32_t> words, uint32_t word_count,
   uint32_t f = 0;
   uint32_t g = 0;
   uint32_t h = 0;
-    uint32_t[64] W;
+  uint32_t[64] W;
+  let split_nonce = split_nonce(nonce);
 
-  for (uint32_t i = 0; i < word_count; i++) {
+  for (uint32_t i = 0; i < word_count / 16; i++) {
     for (uint32_t t = 0; t < 16; t++) {
       W[t] = words[16 * i + t];
+      if (i * 16 + t == nonce_index) {
+        W[t] = split_nonce[0];
+      }
+      if (i * 16 + t == nonce_index + 1) {
+        W[t] = split_nonce[1];
+      }
     }
     for (uint32_t t = 16; t < 64; t++) {
       W[t] = ssig1(W[t - 2]) + W[t - 7] + ssig0(W[t - 15]) + W[t - 16];
     }
-    W[nonce_index] = nonce;
 
     a = H[0];
     b = H[1];
