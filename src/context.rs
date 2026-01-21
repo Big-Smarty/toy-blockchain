@@ -29,7 +29,7 @@ use vulkano::sync::GpuFuture;
 use crate::push_constants::PushConstants;
 use crate::shader;
 
-const WORK_GROUP_COUNTS: [u32; 3] = [4096, 1, 1];
+const WORK_GROUP_COUNTS: [u32; 3] = [8192, 1, 1];
 
 pub struct Context {
     pub(crate) _library: Arc<VulkanLibrary>,
@@ -210,7 +210,6 @@ impl Context {
         nonce
     }
 
-    // TODO: implement this function!!!
     pub fn update_words(&mut self, words: &Vec<u32>) {
         let mut write_words = self.words_buffer.write().unwrap();
         write_words.copy_from_slice(words.as_slice());

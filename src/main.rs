@@ -9,9 +9,7 @@ mod shader;
 mod transaction;
 mod util;
 
-const K: u32 = 6;
-
-// TODO: check for transaction block hashes in a loop and create new transactions properly
+const K: u32 = 7;
 
 fn main() {
     let genesis_hash: [u32; 8];
@@ -28,11 +26,13 @@ fn main() {
         nonce: context.nonce_address().into(),
         k: K,
     };
+    let mut hash_count = 0;
     // genesis transaction
     {
         let mut nonce = 0;
         while nonce == 0 {
             nonce = context.invoke(&push_constants);
+            hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
         let nonce_high = (nonce >> 32) as u32;
@@ -70,6 +70,7 @@ fn main() {
         let mut nonce = 0;
         while nonce == 0 {
             nonce = context.invoke(&push_constants);
+            hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
         let nonce_high = (nonce >> 32) as u32;
@@ -105,6 +106,7 @@ fn main() {
         let mut nonce = 0;
         while nonce == 0 {
             nonce = context.invoke(&push_constants);
+            hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
         let nonce_high = (nonce >> 32) as u32;
@@ -120,4 +122,5 @@ fn main() {
             println!("failure... (3.)");
         }
     }
+    println!("total hashes: {hash_count}");
 }
