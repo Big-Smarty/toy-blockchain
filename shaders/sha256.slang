@@ -51,7 +51,7 @@ public uint32_t[8] sha256(uint32_t* words, uint32_t word_count,
   let split_nonce = split_nonce(nonce);
 
   for (uint32_t i = 0; i < word_count / 16; i++) {
-    for (uint32_t t = 0; t < 16; t++) {
+    [ForceUnroll]for (uint32_t t = 0; t < 16; t++) {
       W[t] = words[16 * i + t];
       if (i * 16 + t == nonce_index) {
         W[t] = split_nonce[0];
@@ -60,7 +60,7 @@ public uint32_t[8] sha256(uint32_t* words, uint32_t word_count,
         W[t] = split_nonce[1];
       }
     }
-    for (uint32_t t = 16; t < 64; t++) {
+    [ForceUnroll] for (uint32_t t = 16; t < 64; t++) {
       W[t] = ssig1(W[t - 2]) + W[t - 7] + ssig0(W[t - 15]) + W[t - 16];
     }
 
@@ -73,7 +73,7 @@ public uint32_t[8] sha256(uint32_t* words, uint32_t word_count,
     g = H[6];
     h = H[7];
 
-    for (uint32_t t = 0; t < 64; t++) {
+    [ForceUnroll] for (uint32_t t = 0; t < 64; t++) {
       uint32_t T1 = h + bsig1(e) + ch(e, f, g) + K[t] + W[t];
       uint32_t T2 = bsig0(a) + maj(a, b, c);
       h = g;

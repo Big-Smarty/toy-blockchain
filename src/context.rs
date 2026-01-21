@@ -29,7 +29,7 @@ use vulkano::sync::GpuFuture;
 use crate::push_constants::PushConstants;
 use crate::shader;
 
-const WORK_GROUP_COUNTS: [u32; 3] = [4096, 1, 1];
+const WORK_GROUP_COUNTS: [u32; 3] = [8192, 1, 1];
 
 pub struct Context {
     pub(crate) _library: Arc<VulkanLibrary>,
@@ -174,6 +174,11 @@ impl Context {
         self.nonce_buffer.device_address().unwrap()
     }
 
+    pub fn nonce(&self) -> u64 {
+        *self.nonce_buffer.read().unwrap()
+    }
+
+    // TODO: return the future instead of the nonce
     pub fn invoke(&mut self, push_constants: &PushConstants) -> u64 {
         let mut command_buffer_builder = AutoCommandBufferBuilder::primary(
             self.command_buffer_allocator.clone(),
@@ -210,7 +215,6 @@ impl Context {
         nonce
     }
 
-    // TODO: implement this function!!!
     pub fn update_words(&mut self, words: &Vec<u32>) {
         let mut write_words = self.words_buffer.write().unwrap();
         write_words.copy_from_slice(words.as_slice());

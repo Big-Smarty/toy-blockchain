@@ -1,18 +1,18 @@
-use crate::{
-    push_constants::PushConstants,
-    util::{check_k_nibbles, hash_to_iv, sha256},
-};
-
+mod bruteforce;
 mod context;
 mod push_constants;
 mod shader;
 mod transaction;
 mod util;
 
-const K: u32 = 6;
+use crate::{
+    push_constants::PushConstants,
+    util::{check_k_nibbles, hash_to_iv, sha256},
+};
 
-// TODO: check for transaction block hashes in a loop and create new transactions properly
+const K: u32 = 8;
 
+// TODO: while waiting on the gpu invocation, bruteforce on the cpu.
 fn main() {
     let genesis_hash: [u32; 8];
     let genesis_transaction = transaction::Transaction::default();
@@ -28,11 +28,13 @@ fn main() {
         nonce: context.nonce_address().into(),
         k: K,
     };
+    let mut hash_count = 0;
     // genesis transaction
     {
         let mut nonce = 0;
         while nonce == 0 {
             nonce = context.invoke(&push_constants);
+            hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
         let nonce_high = (nonce >> 32) as u32;
@@ -70,6 +72,7 @@ fn main() {
         let mut nonce = 0;
         while nonce == 0 {
             nonce = context.invoke(&push_constants);
+            hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
         let nonce_high = (nonce >> 32) as u32;
@@ -105,6 +108,7 @@ fn main() {
         let mut nonce = 0;
         while nonce == 0 {
             nonce = context.invoke(&push_constants);
+            hash_count += 8192 * 64;
             push_constants.generation += 1;
         }
         let nonce_high = (nonce >> 32) as u32;
@@ -120,4 +124,5 @@ fn main() {
             println!("failure... (3.)");
         }
     }
+    println!("total hashes: {hash_count}");
 }
