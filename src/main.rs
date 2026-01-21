@@ -10,7 +10,7 @@ use crate::{
     util::{check_k_nibbles, hash_to_iv, sha256},
 };
 
-const K: u32 = 7;
+const K: u32 = 8;
 
 // TODO: while waiting on the gpu invocation, bruteforce on the cpu.
 fn main() {
