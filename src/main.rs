@@ -1,16 +1,18 @@
-use crate::{
-    push_constants::PushConstants,
-    util::{check_k_nibbles, hash_to_iv, sha256},
-};
-
+mod bruteforce;
 mod context;
 mod push_constants;
 mod shader;
 mod transaction;
 mod util;
 
+use crate::{
+    push_constants::PushConstants,
+    util::{check_k_nibbles, hash_to_iv, sha256},
+};
+
 const K: u32 = 7;
 
+// TODO: while waiting on the gpu invocation, bruteforce on the cpu.
 fn main() {
     let genesis_hash: [u32; 8];
     let genesis_transaction = transaction::Transaction::default();

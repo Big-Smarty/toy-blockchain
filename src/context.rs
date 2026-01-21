@@ -174,6 +174,11 @@ impl Context {
         self.nonce_buffer.device_address().unwrap()
     }
 
+    pub fn nonce(&self) -> u64 {
+        *self.nonce_buffer.read().unwrap()
+    }
+
+    // TODO: return the future instead of the nonce
     pub fn invoke(&mut self, push_constants: &PushConstants) -> u64 {
         let mut command_buffer_builder = AutoCommandBufferBuilder::primary(
             self.command_buffer_allocator.clone(),
