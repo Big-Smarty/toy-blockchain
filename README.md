@@ -10,6 +10,5 @@ Also, aura. Because everything about programming in your free time is about lear
 
 
 # TODO
-- create a vulkan application to preprocess the data and run the compute shader
-- gain as many points as possible
-- profit???
+- create a crypto coin???
+- farm more aura???
